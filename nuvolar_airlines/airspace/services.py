@@ -2,9 +2,10 @@ from uuid import UUID
 
 from django.db.models import QuerySet
 
-from .models import Airport, Aircraft, Flight
-from nuvolar_airlines.airspace import exceptions as airspace_exceptions
+from nuvolar_airlines.contrib import exceptions as airspace_exceptions
 from nuvolar_airlines.contrib.services import BaseService
+
+from .models import Aircraft, Airport, Flight
 
 
 class AirportService(BaseService):
@@ -18,6 +19,16 @@ class AircraftService(BaseService):
         super().__init__()
         self.model = Aircraft
 
+    @staticmethod
+    def get_aircrafts() -> QuerySet[Aircraft]:
+        return Aircraft.objects.all()
+
+    @staticmethod
+    def create_aircraft(data: dict):
+        if Aircraft.objects.filter(data.get("icao_code")).exists():
+            raise airspace_exceptions.AlreadyExists(Aircraft, data.get("icao_code"))
+        return Aircraft.objects.create(**data)
+
 
 class FlightService(BaseService):
     def __init__(self):
@@ -30,9 +41,15 @@ class FlightService(BaseService):
 
     @staticmethod
     def create_flight(data: dict):
-        departure_airport = AirportService().get_obj_by_public_id(data.pop('departure_airport'))
-        arrival_airport = AirportService().get_obj_by_public_id(data.pop('arrival_airport'))
-        aircraft = AircraftService().get_obj_by_public_id(data.pop('aircraft', None), raise_exception=False)
+        departure_airport = AirportService().get_obj_by_public_id(
+            data.pop("departure_airport")
+        )
+        arrival_airport = AirportService().get_obj_by_public_id(
+            data.pop("arrival_airport")
+        )
+        aircraft = AircraftService().get_obj_by_public_id(
+            data.pop("aircraft", None), raise_exception=False
+        )
 
         return Flight.objects.create(
             departure_airport=departure_airport,
@@ -41,3 +58,14 @@ class FlightService(BaseService):
             **data
         )
 
+    @staticmethod
+    def add_aircraft_to_flight(data: dict, flight_public_id: UUID):
+        flight = FlightService().get_obj_by_public_id(flight_public_id)
+        aircraft = AircraftService().get_obj_by_public_id(data.get("aircraft"))
+
+        if flight.aircraft:
+            raise airspace_exceptions.AlreadyHasRelationship(Flight.__name__, aircraft)
+
+        flight.aircraft = aircraft
+        flight.save()
+        return flight

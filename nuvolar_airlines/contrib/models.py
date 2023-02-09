@@ -17,4 +17,3 @@ class BaseModel(models.Model):
         abstract = True
         ordering = ["-created"]
         get_latest_by = "created"
-

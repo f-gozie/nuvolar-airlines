@@ -29,7 +29,9 @@ class Airport(BaseModel):
 
 
 class Flight(BaseModel):
-    aircraft = models.ForeignKey(Aircraft, on_delete=models.CASCADE, null=True, blank=True)
+    aircraft = models.ForeignKey(
+        Aircraft, on_delete=models.CASCADE, null=True, blank=True
+    )
     departure_airport = models.ForeignKey(
         Airport, on_delete=models.CASCADE, related_name="departure_airport"
     )
