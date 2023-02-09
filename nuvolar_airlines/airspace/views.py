@@ -61,6 +61,19 @@ class FlightViewSet(viewsets.ModelViewSet):
         response = self.serializer_class(obj).data
         return Response(response, status=status.HTTP_200_OK)
 
+    @action(
+        detail=False,
+        methods=["get"],
+        url_path="generate-report",
+        url_name="generate-report",
+    )
+    def generate_report(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        query_params = request.GET
+
+        report = self.service_class.generate_report(query_params)
+
+        return Response(report, status=status.HTTP_200_OK)
+
 
 class AircraftViewSet(viewsets.ModelViewSet):
     service_class = AircraftService

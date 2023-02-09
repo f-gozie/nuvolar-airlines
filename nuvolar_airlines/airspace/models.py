@@ -30,13 +30,17 @@ class Airport(BaseModel):
 
 class Flight(BaseModel):
     aircraft = models.ForeignKey(
-        Aircraft, on_delete=models.CASCADE, null=True, blank=True
+        Aircraft,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="flights",
     )
     departure_airport = models.ForeignKey(
-        Airport, on_delete=models.CASCADE, related_name="departure_airport"
+        Airport, on_delete=models.CASCADE, related_name="departure_flights"
     )
     arrival_airport = models.ForeignKey(
-        Airport, on_delete=models.CASCADE, related_name="arrival_airport"
+        Airport, on_delete=models.CASCADE, related_name="arrival_flights"
     )
     departure_time = models.DateTimeField()
     arrival_time = models.DateTimeField()

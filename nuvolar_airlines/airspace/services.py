@@ -6,6 +6,7 @@ from django.utils import timezone
 from nuvolar_airlines.contrib import exceptions as airspace_exceptions
 from nuvolar_airlines.contrib.services import BaseService
 
+from ..utils.helpers import convert_str_to_aware_datetime
 from .models import Aircraft, Airport, Flight
 
 
@@ -72,3 +73,45 @@ class FlightService(BaseService):
         flight.aircraft = aircraft
         flight.save()
         return flight
+
+    @staticmethod
+    def generate_report(data: dict) -> dict:
+        departure_date = convert_str_to_aware_datetime(
+            data.get("departure_time", ""), "departure_time"
+        )
+        arrival_date = convert_str_to_aware_datetime(
+            data.get("arrival_time", ""), "arrival_time"
+        )
+        flight_qs = Flight.objects.filter(
+            departure_time__gte=departure_date, arrival_time__lte=arrival_date
+        ).select_related("aircraft")
+
+        analysis = {}
+        for flight in flight_qs:
+            in_flight_time = (
+                flight.arrival_time - flight.departure_time
+            ).total_seconds() / 60
+            if in_flight_time >= (arrival_date - departure_date).total_seconds() / 60:
+                serial_number = (
+                    flight.aircraft.serial_number if flight.aircraft else "No Aircraft"
+                )
+                if flight.departure_airport.name not in analysis:
+                    analysis[flight.departure_airport.name] = {
+                        "no_of_flights": 1,
+                        "aircrafts": {serial_number: in_flight_time},
+                    }
+                else:
+                    analysis[flight.departure_airport.name]["no_of_flights"] += 1
+                    if (
+                        serial_number
+                        not in analysis[flight.departure_airport.name]["aircrafts"]
+                    ):
+                        analysis[flight.departure_airport.name]["aircrafts"][
+                            serial_number
+                        ] = in_flight_time
+                    else:
+                        analysis[flight.departure_airport.name]["aircrafts"][
+                            serial_number
+                        ] += in_flight_time
+
+        return analysis

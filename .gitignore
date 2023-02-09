@@ -334,3 +334,4 @@ nuvolar_airlines/media/
 .env
 .envs/*
 !.envs/.local/
+.idea/*

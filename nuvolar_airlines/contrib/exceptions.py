@@ -30,3 +30,14 @@ class FlightAlreadyDeparted(APIException):
     status_code = status.HTTP_400_BAD_REQUEST
     default_code = "flight_already_departed"
     default_detail = "The departure time for this flight has already passed"
+
+
+class InvalidDateFormat(APIException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    default_code = "invalid_date_format"
+
+    def __init__(self, field):
+        self.detail = (
+            f"Invalid date format provided in field: {field}. Please ensure date is in this format: "
+            f"<YYYY-MM-DD HH:MM:SS>"
+        )
