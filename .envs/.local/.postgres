@@ -1,0 +1,7 @@
+# PostgreSQL
+# ------------------------------------------------------------------------------
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+POSTGRES_DB=nuvolar_airlines
+POSTGRES_USER=gsWzvdmNEEiPEcjQxgfYpYPShFnYIOKo
+POSTGRES_PASSWORD=Xb1waiwIakzgHyxiFhnNe3XmiLuR2OPiuXMwHJcxzoSGUWh7qAH2EgYNSt1gynuU
