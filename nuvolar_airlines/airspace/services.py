@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from django.db.models import QuerySet
+from django.utils import timezone
 
 from nuvolar_airlines.contrib import exceptions as airspace_exceptions
 from nuvolar_airlines.contrib.services import BaseService
@@ -65,6 +66,8 @@ class FlightService(BaseService):
 
         if flight.aircraft:
             raise airspace_exceptions.AlreadyHasRelationship(Flight.__name__, aircraft)
+        if flight.departure_time < timezone.now():
+            raise airspace_exceptions.FlightAlreadyDeparted()
 
         flight.aircraft = aircraft
         flight.save()

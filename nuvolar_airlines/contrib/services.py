@@ -11,7 +11,7 @@ class BaseService:
 
     def get_obj_by_public_id(
         self, public_id: UUID, raise_exception: bool = True
-    ) -> Model:
+    ) -> type[Model]:
         objs = self.model.objects.filter(public_id=public_id)
         if not objs and raise_exception:
             raise airspace_exceptions.DoesNotExist(

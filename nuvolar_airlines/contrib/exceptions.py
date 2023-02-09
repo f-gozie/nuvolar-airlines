@@ -24,3 +24,9 @@ class AlreadyHasRelationship(APIException):
 
     def __init__(self, klass, unique_key):
         self.detail = f"This {klass.lower()} already has a relationship with a <{unique_key}> entity"
+
+
+class FlightAlreadyDeparted(APIException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    default_code = "flight_already_departed"
+    default_detail = "The departure time for this flight has already passed"
