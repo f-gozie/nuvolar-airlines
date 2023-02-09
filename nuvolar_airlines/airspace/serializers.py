@@ -7,7 +7,7 @@ from nuvolar_airlines.contrib.validators import FutureDateValidator
 class FlightSerializer(serializers.ModelSerializer):
     departure_airport = serializers.UUIDField()
     arrival_airport = serializers.UUIDField()
-    aircraft = serializers.UUIDField(source="aircraft.public_id", required=False)
+    aircraft = serializers.UUIDField(required=False)
     departure_time = serializers.DateTimeField(validators=[FutureDateValidator()])
     arrival_time = serializers.DateTimeField(validators=[FutureDateValidator()])
 
