@@ -14,14 +14,17 @@ class FlightFactory(DjangoModelFactory):
     aircraft = factory.SubFactory(
         "nuvolar_airlines.airspace.tests.factories.AircraftFactory"
     )
-    departure_time = factory.Faker("date_time")
-    arrival_time = factory.Faker("date_time")
+    departure_time = factory.Faker(
+        "date_time_between", start_date="+1d", end_date="+2d"
+    )
+    arrival_time = factory.Faker("date_time_between", start_date="+3d", end_date="+4d")
 
     class Meta:
         model = models.Flight
 
 
 class AirportFactory(DjangoModelFactory):
+    name = factory.Faker("city")
     icao_code = factory.Faker("bothify", text="????")
 
     class Meta:
@@ -30,6 +33,7 @@ class AirportFactory(DjangoModelFactory):
 
 class AircraftFactory(DjangoModelFactory):
     serial_number = factory.Faker("bothify", text="????")
+    manufacturer = factory.Faker("company")
 
     class Meta:
         model = models.Aircraft

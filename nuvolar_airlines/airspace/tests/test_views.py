@@ -1,13 +1,15 @@
 from django.urls import reverse
 from rest_framework.test import APITestCase
 
+from nuvolar_airlines.airspace.services import FlightService
+
 from .factories import AircraftFactory, AirportFactory, FlightFactory
 
 
 class TestFlightViewSet(APITestCase):
     def setUp(self) -> None:
         self.url = reverse("airspace:flights-list")
-        self.dummy_flight = FlightFactory.create()
+        self.dummy_flight = FlightFactory.create(departure_time="2021-05-01 00:00:00")
         self.detail_url = reverse(
             "airspace:flights-detail", kwargs={"public_id": self.dummy_flight.public_id}
         )
@@ -92,3 +94,65 @@ class TestFlightViewSet(APITestCase):
         response = self.client.post(self.url, self.payload, format="json")
 
         self.assertEqual(response.status_code, 400)
+
+    def test_can_filter_flights_within_a_time_range(self):
+        self.payload["departure_time"] = "2023-05-06 00:00:00"
+        self.payload["arrival_time"] = "2023-05-07 00:00:00"
+        self.client.post(self.url, self.payload, format="json")
+
+        self.payload["departure_time"] = "2023-05-06 00:00:00"
+        self.payload["arrival_time"] = "2023-05-07 00:00:00"
+        self.client.post(self.url, self.payload, format="json")
+
+        response = self.client.get(
+            self.url, {"departure_time__gte": "2023-05-06 00:00:00"}
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 3)
+
+    def test_can_filter_flights_by_departure_airport(self):
+        self.payload["departure_airport"] = self.departure_airport.public_id
+        self.client.post(self.url, self.payload, format="json")
+
+        response = self.client.get(
+            self.url, {"departure_airport": self.departure_airport.icao_code}
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+
+    def test_can_filter_flights_by_arrival_airport(self):
+        self.payload["arrival_airport"] = self.arrival_airport.public_id
+        self.client.post(self.url, self.payload, format="json")
+
+        response = self.client.get(
+            self.url, {"arrival_airport": self.arrival_airport.icao_code}
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+
+    def test_can_generate_flight_report(self):
+        flights = FlightFactory.create_batch(10)
+
+        data = {
+            "departure_time": flights[0].departure_time.strftime("%Y-%m-%d %H:%M:%S"),
+            "arrival_time": flights[0].arrival_time.strftime("%Y-%m-%d %H:%M:%S"),
+        }
+
+        result = FlightService.generate_report(data)
+
+        self.assertIsInstance(result, dict)
+        self.assertIn(flights[0].departure_airport.name, result)
+        self.assertEqual(result[flights[0].departure_airport.name]["no_of_flights"], 1)
+        self.assertIn(
+            flights[0].aircraft.serial_number,
+            result[flights[0].departure_airport.name]["aircrafts"],
+        )
+        self.assertEqual(
+            result[flights[0].departure_airport.name]["aircrafts"][
+                flights[0].aircraft.serial_number
+            ],
+            (flights[0].arrival_time - flights[0].departure_time).total_seconds() / 60,
+        )
