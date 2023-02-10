@@ -7,17 +7,18 @@ A REST API to perform CRUD operations on a fleet via an airline management syste
 [![Black code style](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 
 ## API Reference
+### Below is a list of all vital endpoints. To view all the other endpoints, please visit the API docs at `localhost:8000/api/docs/`
 
 #### Get all flights
 
-```http
+```
   GET /api/airspace/flights/
 ```
 
 
 #### Get single flight
 
-```http
+```
   GET /api/airspace/<flight_public_id>/
 ```
 
@@ -27,7 +28,7 @@ A REST API to perform CRUD operations on a fleet via an airline management syste
 
 #### Create a flight
 
-```http
+```
   POST /api/airspace/flights/
 ```
 
@@ -40,7 +41,7 @@ A REST API to perform CRUD operations on a fleet via an airline management syste
 
 #### Add an aircraft to a flight
 
-```http
+```
   POST /api/airspace/flights/<flight_public_id>/add-aircraft/
 ```
 
@@ -54,7 +55,7 @@ A REST API to perform CRUD operations on a fleet via an airline management syste
 
 
 #### Generate Report
-```http
+```
   POST /api/airspace/flights/generate-report/
 ```
 | Query Parameter | Type     | Description                       |
