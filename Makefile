@@ -64,3 +64,6 @@ restore:
 
 restore-from-dump:
 				docker compose -f local.yml run --rm postgres restore-from-dump $(file)
+
+populate-airports:
+				docker compose -f local.yml run --rm django python manage.py populate-airports

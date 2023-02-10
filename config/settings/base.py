@@ -333,3 +333,4 @@ SPECTACULAR_SETTINGS = {
 }
 # Your stuff...
 # ------------------------------------------------------------------------------
+AVIATION_STACK_API_KEY = env("AVIATION_STACK_API_KEY")
