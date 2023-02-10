@@ -27,8 +27,8 @@ class AircraftService(BaseService):
 
     @staticmethod
     def create_aircraft(data: dict):
-        if Aircraft.objects.filter(data.get("icao_code")).exists():
-            raise airspace_exceptions.AlreadyExists(Aircraft, data.get("icao_code"))
+        if Aircraft.objects.filter(serial_number=data.get("serial_number")).exists():
+            raise airspace_exceptions.AlreadyExists(Aircraft, data.get("serial_number"))
         return Aircraft.objects.create(**data)
 
 

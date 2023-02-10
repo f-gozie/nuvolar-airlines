@@ -76,6 +76,7 @@ class FlightViewSet(viewsets.ModelViewSet):
 
 
 class AircraftViewSet(viewsets.ModelViewSet):
+    lookup_field = "public_id"
     service_class = AircraftService
     serializer_class = AircraftSerializer
     permission_classes = [AllowAny]

@@ -133,6 +133,19 @@ class TestFlightViewSet(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
 
+    def test_can_add_aircraft_to_flight(self):
+        new_dummy_flight = FlightFactory.create(aircraft=None)
+        aircraft_url = reverse(
+            "airspace:flights-add-aircraft", args=[new_dummy_flight.public_id]
+        )
+
+        response = self.client.post(
+            aircraft_url, {"aircraft": self.aircraft.public_id}, format="json"
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["aircraft"], self.aircraft.__str__())
+
     def test_can_generate_flight_report(self):
         flights = FlightFactory.create_batch(10)
 
@@ -156,3 +169,46 @@ class TestFlightViewSet(APITestCase):
             ],
             (flights[0].arrival_time - flights[0].departure_time).total_seconds() / 60,
         )
+
+
+class TestAircraftViewSet(APITestCase):
+    def setUp(self) -> None:
+        self.url = reverse("airspace:aircrafts-list")
+        self.aircraft = AircraftFactory.create()
+        self.detail_url = reverse(
+            "airspace:aircrafts-detail", args=[self.aircraft.public_id]
+        )
+        self.payload = {
+            "serial_number": "AB12",
+            "manufacturer": "Boeing",
+        }
+        self.aircraft = AircraftFactory.create()
+
+    def test_can_create_aircraft(self):
+        response = self.client.post(self.url, self.payload, format="json")
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data["serial_number"], self.payload["serial_number"])
+        self.assertEqual(response.data["manufacturer"], self.payload["manufacturer"])
+
+    def test_can_retrieve_aircraft(self):
+        aircraft = AircraftFactory.create()
+        detail_url = reverse("airspace:aircrafts-detail", args=[aircraft.public_id])
+        response = self.client.get(detail_url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["serial_number"], aircraft.serial_number)
+        self.assertEqual(response.data["manufacturer"], aircraft.manufacturer)
+
+    def test_can_update_aircraft(self):
+        self.payload["manufacturer"] = "Airbus"
+        response = self.client.put(self.detail_url, self.payload, format="json")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["serial_number"], self.payload["serial_number"])
+        self.assertEqual(response.data["manufacturer"], self.payload["manufacturer"])
+
+    def test_can_delete_aircraft(self):
+        response = self.client.delete(self.detail_url)
+
+        self.assertEqual(response.status_code, 204)
