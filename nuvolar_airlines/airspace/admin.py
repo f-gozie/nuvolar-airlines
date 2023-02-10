@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Aircraft, Airport, Flight
+from .models import Aircraft, Airport, Flight, FlightReport
 
 
 @admin.register(Airport)
@@ -37,3 +37,10 @@ class FlightAdmin(admin.ModelAdmin):
         "departure_time",
         "arrival_time",
     ]
+
+
+@admin.register(FlightReport)
+class FlightReportAdmin(admin.ModelAdmin):
+    list_display = ["report_date", "airport_name", "no_flights", "aircraft_stats"]
+    list_filter = ["report_date", "airport_name", "no_flights"]
+    search_fields = ["report_date", "airport_name"]

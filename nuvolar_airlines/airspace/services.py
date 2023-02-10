@@ -5,9 +5,10 @@ from django.utils import timezone
 
 from nuvolar_airlines.contrib import exceptions as airspace_exceptions
 from nuvolar_airlines.contrib.services import BaseService
+from nuvolar_airlines.utils.helpers import convert_str_to_aware_datetime
 
-from ..utils.helpers import convert_str_to_aware_datetime
 from .models import Aircraft, Airport, Flight
+from .tasks import store_flight_report
 
 
 class AirportService(BaseService):
@@ -76,6 +77,7 @@ class FlightService(BaseService):
 
     @staticmethod
     def generate_report(data: dict) -> dict:
+        save_to_db = data.get("save_to_db", False)
         departure_date = convert_str_to_aware_datetime(
             data.get("departure_time", ""), "departure_time"
         )
@@ -113,5 +115,8 @@ class FlightService(BaseService):
                         analysis[flight.departure_airport.name]["aircrafts"][
                             serial_number
                         ] += in_flight_time
+
+        if save_to_db:
+            store_flight_report.delay(analysis)
 
         return analysis

@@ -51,3 +51,17 @@ class Flight(BaseModel):
 
     def __str__(self):
         return f"Flight from {self.departure_airport} to {self.arrival_airport} at {self.departure_time}"
+
+
+class FlightReport(BaseModel):
+    report_date = models.DateTimeField()
+    airport_name = models.CharField(max_length=255)
+    no_flights = models.IntegerField()
+    aircraft_stats = models.JSONField()
+
+    class Meta:
+        verbose_name = _("Flight Report")
+        verbose_name_plural = _("Flight Reports")
+
+    def __str__(self):
+        return f"Flight Report for {self.airport_name} on {self.report_date}"
