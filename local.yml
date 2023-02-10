@@ -26,30 +26,14 @@ services:
   postgres:
     build:
       context: .
-      dockerfile: ./compose/production/postgres/Dockerfile
-    image: nuvolar_airlines_production_postgres
+      dockerfile: ./compose/local/postgres/Dockerfile
+    image: nuvolar_airlines_local_postgres
     container_name: nuvolar_airlines_local_postgres
     volumes:
       - nuvolar_airlines_local_postgres_data:/var/lib/postgresql/data
       - nuvolar_airlines_local_postgres_data_backups:/backups
     env_file:
       - ./.envs/.local/.postgres
-
-  docs:
-    image: nuvolar_airlines_local_docs
-    container_name: nuvolar_airlines_local_docs
-    build:
-      context: .
-      dockerfile: ./compose/local/docs/Dockerfile
-    env_file:
-      - ./.envs/.local/.django
-    volumes:
-      - ./docs:/docs:z
-      - ./config:/app/config:z
-      - ./nuvolar_airlines:/app/nuvolar_airlines:z
-    ports:
-      - "9000:9000"
-    command: /start-docs
 
   redis:
     image: redis:6

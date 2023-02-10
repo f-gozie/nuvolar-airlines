@@ -14,7 +14,7 @@ class FlightSerializer(serializers.ModelSerializer):
     def validate(self, data):
         if data["departure_time"] == data["arrival_time"]:
             raise serializers.ValidationError(
-                "Departure and arrival airports must be different"
+                "Departure and arrival time must be different"
             )
         if data["departure_time"] > data["arrival_time"]:
             raise serializers.ValidationError(
